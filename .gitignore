@@ -1,0 +1,40 @@
+# Python virtual environment
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Streamlit logs
+streamlit_out.log
+streamlit_err.log
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# IDE settings
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# CatBoost training logs
+catboost_info/
+
+# Scratch files
+scratch/
+check_data.py
+
+# Large raw data files (keep processed ones for the app)
+data/raw/lap_times.csv
