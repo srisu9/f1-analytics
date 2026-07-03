@@ -1,21 +1,21 @@
-"""
-07_error_analysis.py  — Biggest Upset Analysis
-================================================
-Identifies races where the model was most confidently WRONG:
-
-  * False Positives  (Upsets):  predicted P(Top10) ≥ 0.9  BUT driver finished OUTSIDE Top 10
-  * False Negatives (Comebacks): predicted P(Top10) ≤ 0.1  BUT driver finished IN Top 10
-
-Outputs
--------
-  - Console tables of the biggest upsets / comebacks
-  - reports/figures/18_error_calibration.png  – calibration curve
-  - reports/figures/19_error_by_year.png      – false positive / false negative counts by year
-  - reports/figures/20_top_upsets.png         – top 20 upsets bar chart
-
-Run from project root:
-    python notebooks/07_error_analysis.py
-"""
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+   
 
 import sys
 import os
@@ -32,14 +32,14 @@ from sklearn.metrics import brier_score_loss
 
 from src.model_trainer import prepare_ml_data
 
-# ──────────────────────────────────────────────
+                                                
 DATA_PATH   = "data/processed/model_ready.csv"
 MODELS_DIR  = "models"
 FIGURES_DIR = "reports/figures"
 SPLIT_YEAR  = 2019
-FP_THRESH   = 0.75   # confident prediction of Top10 → actually not
-FN_THRESH   = 0.25   # confident prediction of non-Top10 → actually scored
-# ──────────────────────────────────────────────
+FP_THRESH   = 0.75                                                 
+FN_THRESH   = 0.25                                                        
+                                                
 
 os.makedirs(FIGURES_DIR, exist_ok=True)
 
@@ -64,7 +64,7 @@ def main():
     print("F1 Analytics — Error Analysis & Biggest Upsets")
     print("=" * 60)
 
-    # ── Load data ─────────────────────────────────────────────────
+                                                                    
     df_raw = pd.read_csv(DATA_PATH)
     print(f"Loaded {len(df_raw):,} rows.")
 
@@ -72,7 +72,7 @@ def main():
         df_raw, split_year=SPLIT_YEAR
     )
 
-    # ── Load model ────────────────────────────────────────────────
+                                                                    
     for path in [
         os.path.join(MODELS_DIR, "xgboost_wfv.joblib"),
         os.path.join(MODELS_DIR, "xgboost_tuned.joblib"),
@@ -85,14 +85,14 @@ def main():
     else:
         raise FileNotFoundError("No trained model found. Run training pipeline first.")
 
-    # ── Generate predictions on the test set ──────────────────────
+                                                                    
     y_prob = model.predict_proba(X_test)[:, 1]
     y_pred = (y_prob >= 0.5).astype(int)
 
-    # Attach predictions to the original test rows (same index)
+                                                               
     test_mask = df_raw["year"] >= SPLIT_YEAR
     df_test   = df_raw[test_mask].copy().reset_index(drop=True)
-    df_test   = df_test.iloc[:len(y_prob)].copy()   # guard length mismatch
+    df_test   = df_test.iloc[:len(y_prob)].copy()                          
 
     df_test["pred_prob"]  = y_prob
     df_test["pred_label"] = y_pred
@@ -100,7 +100,7 @@ def main():
     df_test["correct"]    = (df_test["pred_label"] == df_test["actual"]).astype(int)
     df_test["error_mag"]  = (df_test["pred_prob"] - df_test["actual"]).abs()
 
-    # ── False Positives: model very confident of Top10 but wrong ──
+                                                                    
     fp_mask = (df_test["pred_prob"] >= FP_THRESH) & (df_test["actual"] == 0)
     df_fp   = df_test[fp_mask].sort_values("pred_prob", ascending=False)
 
@@ -112,7 +112,7 @@ def main():
     cols_show = ["year", "race_name", "driverRef", "constructor_name", "grid", "pred_prob"]
     print(df_fp[cols_show].head(20).to_string(index=False))
 
-    # ── False Negatives: model very confident of Non-Top10 but wrong ─
+                                                                       
     fn_mask = (df_test["pred_prob"] <= FN_THRESH) & (df_test["actual"] == 1)
     df_fn   = df_test[fn_mask].sort_values("pred_prob", ascending=True)
 
@@ -123,11 +123,11 @@ def main():
     print(f"{'='*60}")
     print(df_fn[cols_show].head(20).to_string(index=False))
 
-    # ── Brier Score (calibration quality) ─────────────────────────
+                                                                    
     brier = brier_score_loss(df_test["actual"], df_test["pred_prob"])
     print(f"\nBrier Score: {brier:.4f}  (lower = better calibrated; perfect = 0.0)")
 
-    # ── Plot 1: Calibration Curve ──────────────────────────────────
+                                                                     
     frac_pos, mean_pred = calibration_curve(df_test["actual"], df_test["pred_prob"], n_bins=10)
 
     fig, ax = plt.subplots(figsize=(8, 6))
@@ -146,7 +146,7 @@ def main():
     plt.close()
     print(f"\nSaved: {out}")
 
-    # ── Plot 2: Error counts by year ───────────────────────────────
+                                                                     
     by_year = df_test.groupby("year").apply(lambda g: pd.Series({
         "False Positives":  ((g["pred_prob"] >= FP_THRESH) & (g["actual"] == 0)).sum(),
         "False Negatives":  ((g["pred_prob"] <= FN_THRESH) & (g["actual"] == 1)).sum(),
@@ -172,7 +172,7 @@ def main():
     plt.close()
     print(f"Saved: {out}")
 
-    # ── Plot 3: Top 20 Upsets bar chart ───────────────────────────
+                                                                    
     top_upsets = df_fp.head(20).copy()
     top_upsets["label"] = (
         top_upsets["driverRef"] + "\n" +

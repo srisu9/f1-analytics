@@ -1,24 +1,24 @@
-"""
-08_walk_forward_eval.py
-=======================
-Walk-Forward Cross-Validation for F1 Top 10 Prediction.
-
-Strategy
---------
-For each test year Y in [2019, 2020, ..., max_year]:
-  - Train on ALL data where year < Y
-  - Test  on data where year == Y
-  
-Three models are trained per fold: XGBoost, CatBoost, LightGBM.
-An ensemble blender is evaluated on each fold as well.
-Aggregate metrics (mean ± std) are printed and a comparison chart is saved.
-
-After the loop, the FINAL models (trained on all data up to max_year-1,
-tested on max_year) are saved to models/.
-
-Run from the project root:
-    python notebooks/08_walk_forward_eval.py
-"""
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+   
 
 import sys
 import os
@@ -34,7 +34,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 from xgboost import XGBClassifier
 
-# Try to import optional libraries gracefully
+                                             
 try:
     from catboost import CatBoostClassifier
     HAS_CATBOOST = True
@@ -51,24 +51,19 @@ except ImportError:
 
 from src.model_trainer import prepare_fold_data
 
-# ──────────────────────────────────────────────
-# Configuration
-# ──────────────────────────────────────────────
+                                                
 DATA_PATH   = "data/processed/model_ready.csv"
 MODELS_DIR  = "models"
 FIGURES_DIR = "reports/figures"
-TEST_YEARS  = list(range(2019, 2026))   # inclusive
+TEST_YEARS  = list(range(2019, 2026))              
 
-# Ensemble weights (will be renormalized for missing models)
+                                                            
 ENS_WEIGHTS = {"xgb": 0.4, "cat": 0.4, "lgb": 0.2}
 
 os.makedirs(MODELS_DIR,  exist_ok=True)
 os.makedirs(FIGURES_DIR, exist_ok=True)
 
 
-# ──────────────────────────────────────────────
-# Helper: build a model for each library
-# ──────────────────────────────────────────────
 def build_xgb():
     return XGBClassifier(
         n_estimators=300,
@@ -109,9 +104,6 @@ def build_lgb():
     )
 
 
-# ──────────────────────────────────────────────
-# Helper: evaluate a model
-# ──────────────────────────────────────────────
 def eval_model(model, X_test, y_test):
     y_pred = model.predict(X_test)
     y_prob = model.predict_proba(X_test)[:, 1]
@@ -124,9 +116,6 @@ def eval_model(model, X_test, y_test):
     }
 
 
-# ──────────────────────────────────────────────
-# Helper: ensemble prediction
-# ──────────────────────────────────────────────
 def ensemble_proba(models_dict, weights, X_test):
     """Weighted average of predict_proba outputs."""
     active = {k: m for k, m in models_dict.items() if m is not None}
@@ -137,9 +126,6 @@ def ensemble_proba(models_dict, weights, X_test):
     return blend
 
 
-# ──────────────────────────────────────────────
-# Main walk-forward loop
-# ──────────────────────────────────────────────
 def main():
     print("=" * 60)
     print("F1 Analytics — Walk-Forward Cross-Validation")
@@ -151,7 +137,7 @@ def main():
     all_years = sorted(df["year"].unique())
     print(f"Years in dataset: {all_years[0]} – {all_years[-1]}\n")
 
-    # Storage for per-fold metrics
+                                  
     fold_records = []
 
     for test_year in TEST_YEARS:
@@ -170,7 +156,7 @@ def main():
 
         fold_models = {}
 
-        # ── XGBoost ──────────────────────────────────
+                                                       
         xgb = build_xgb()
         xgb.fit(X_train, y_train)
         fold_models["xgb"] = xgb
@@ -178,7 +164,7 @@ def main():
         print(f"  XGBoost  -> Acc: {m['accuracy']:.4f}  F1: {m['f1']:.4f}  AUC: {m['auc']:.4f}")
         fold_records.append({"model": "XGBoost", "year": test_year, **m})
 
-        # ── CatBoost ─────────────────────────────────
+                                                       
         cat = build_cat()
         if cat is not None:
             cat.fit(X_train, y_train)
@@ -189,7 +175,7 @@ def main():
         else:
             fold_models["cat"] = None
 
-        # ── LightGBM ─────────────────────────────────
+                                                       
         lgb = build_lgb()
         if lgb is not None:
             lgb.fit(X_train, y_train)
@@ -200,7 +186,7 @@ def main():
         else:
             fold_models["lgb"] = None
 
-        # ── Ensemble ─────────────────────────────────
+                                                       
         ens_prob = ensemble_proba(fold_models, ENS_WEIGHTS, X_test)
         ens_pred = (ens_prob >= 0.5).astype(int)
         m = {
@@ -213,9 +199,7 @@ def main():
         print(f"  Ensemble -> Acc: {m['accuracy']:.4f}  F1: {m['f1']:.4f}  AUC: {m['auc']:.4f}")
         fold_records.append({"model": "Ensemble", "year": test_year, **m})
 
-    # ──────────────────────────────────────────────
-    # Aggregate metrics across folds
-    # ──────────────────────────────────────────────
+                                                    
     results_df = pd.DataFrame(fold_records)
     print("\n" + "=" * 60)
     print("AGGREGATE METRICS (mean ± std across all folds)")
@@ -223,9 +207,7 @@ def main():
     agg = results_df.groupby("model")[["accuracy", "precision", "recall", "f1", "auc"]].agg(["mean", "std"])
     print(agg.to_string())
 
-    # ──────────────────────────────────────────────
-    # Save final models (retrain on all data up to last fold)
-    # ──────────────────────────────────────────────
+                                                    
     print("\nTraining FINAL models on all data up to 2024, saving to models/...")
     final_train_years = [y for y in all_years if y < 2025]
     final_test_year   = max(y for y in all_years if y >= 2019)
@@ -251,9 +233,7 @@ def main():
             joblib.dump(final_lgb, os.path.join(MODELS_DIR, "lightgbm_model.joblib"))
             print(f"  Saved lightgbm_model.joblib")
 
-    # ──────────────────────────────────────────────
-    # Plot: fold-by-fold F1 and AUC comparison
-    # ──────────────────────────────────────────────
+                                                    
     models_in_results = results_df["model"].unique()
     colors = {"XGBoost": "#e10600", "CatBoost": "#00b2ff", "LightGBM": "#2ecc71", "Ensemble": "#f39c12"}
 
@@ -289,9 +269,7 @@ def main():
     plt.close()
     print(f"\nSaved chart: {out_path}")
 
-    # ──────────────────────────────────────────────
-    # Plot: mean metrics bar chart
-    # ──────────────────────────────────────────────
+                                                    
     mean_metrics = results_df.groupby("model")[["accuracy", "f1", "auc"]].mean().reset_index()
     x = np.arange(len(mean_metrics))
     width = 0.25

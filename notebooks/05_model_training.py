@@ -13,7 +13,7 @@ from xgboost import XGBClassifier
 from sklearn.metrics import roc_curve, auc
 from sklearn.model_selection import RandomizedSearchCV
 
-# Add src/ to path
+                  
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 
 from model_trainer import prepare_ml_data, evaluate_predictions
@@ -22,12 +22,11 @@ def train_and_evaluate():
     print("Loading data for model training...")
     df = pd.read_csv("data/processed/model_ready.csv")
     
-    # Pre-process & Split
-    # Split at 2019: train on pre-2019, test on 2019+
+                         
     print("Preparing train/test split (split year = 2019)...")
     X_train, y_train, X_test, y_test, X_train_s, X_test_s, preprocessor = prepare_ml_data(df, split_year=2019)
     
-    # Save preprocessor
+                       
     models_dir = "models"
     os.makedirs(models_dir, exist_ok=True)
     joblib.dump(preprocessor, f"{models_dir}/preprocessor.joblib")
@@ -38,9 +37,7 @@ def train_and_evaluate():
     
     results = {}
     
-    # ----------------------------------------------------
-    # 1. Logistic Regression
-    # ----------------------------------------------------
+                                                          
     print("\nTraining Logistic Regression...")
     lr = LogisticRegression(max_iter=1000, random_state=42)
     lr.fit(X_train_s, y_train)
@@ -52,9 +49,7 @@ def train_and_evaluate():
         "probs": lr_probs
     }
     
-    # ----------------------------------------------------
-    # 2. Decision Tree
-    # ----------------------------------------------------
+                                                          
     print("Training Decision Tree...")
     dt = DecisionTreeClassifier(max_depth=6, min_samples_split=20, random_state=42)
     dt.fit(X_train, y_train)
@@ -66,9 +61,7 @@ def train_and_evaluate():
         "probs": dt_probs
     }
     
-    # ----------------------------------------------------
-    # 3. Random Forest
-    # ----------------------------------------------------
+                                                          
     print("Training Random Forest...")
     rf = RandomForestClassifier(n_estimators=100, max_depth=10, min_samples_split=10, random_state=42, n_jobs=-1)
     rf.fit(X_train, y_train)
@@ -80,9 +73,7 @@ def train_and_evaluate():
         "probs": rf_probs
     }
     
-    # ----------------------------------------------------
-    # 4. XGBoost (Baseline)
-    # ----------------------------------------------------
+                                                          
     print("Training Baseline XGBoost...")
     xgb = XGBClassifier(n_estimators=100, max_depth=5, learning_rate=0.05, random_state=42, n_jobs=-1)
     xgb.fit(X_train, y_train)
@@ -94,9 +85,7 @@ def train_and_evaluate():
         "probs": xgb_probs
     }
     
-    # ----------------------------------------------------
-    # 5. XGBoost (Tuned)
-    # ----------------------------------------------------
+                                                          
     print("Tuning XGBoost Hyperparameters...")
     param_dist = {
         "n_estimators": [50, 100, 150],
@@ -106,7 +95,7 @@ def train_and_evaluate():
         "colsample_bytree": [0.7, 0.8, 0.9]
     }
     xgb_tuning = XGBClassifier(random_state=42, n_jobs=-1)
-    # Temporal splitting requires timeseries split or simple random search on train data
+                                                                                        
     rs = RandomizedSearchCV(xgb_tuning, param_distributions=param_dist, n_iter=8, scoring="roc_auc", cv=3, random_state=42, n_jobs=-1)
     rs.fit(X_train, y_train)
     print(f"Best XGBoost Params: {rs.best_params_}")
@@ -120,14 +109,14 @@ def train_and_evaluate():
         "probs": xgb_tuned_probs
     }
     
-    # Save models
+                 
     for name, res in results.items():
         filename = name.lower().replace(" ", "_").replace("(", "").replace(")", "")
         filepath = f"{models_dir}/{filename}.joblib"
         joblib.dump(res["model"], filepath)
         print(f"Saved {name} model to {filepath}")
         
-    # Print comparison table
+                            
     metrics_summary = []
     for name, res in results.items():
         m = res["metrics"]
@@ -144,15 +133,13 @@ def train_and_evaluate():
     print("\nModel Comparison Table:")
     print(summary_df.to_string(index=False))
     
-    # Save summary table
+                        
     summary_df.to_csv("reports/model_comparison.csv", index=False)
     
-    # ----------------------------------------------------
-    # Visualizations
-    # ----------------------------------------------------
+                                                          
     fig_dir = "reports/figures"
     
-    # Plot ROC Curve
+                    
     plt.figure(figsize=(10, 8))
     for name, res in results.items():
         fpr, tpr, _ = roc_curve(y_test, res["probs"])
@@ -170,7 +157,7 @@ def train_and_evaluate():
     plt.savefig(f"{fig_dir}/11_roc_comparison.png", dpi=150, facecolor='#121212')
     plt.close()
     
-    # Plot Metrics Bar Chart
+                            
     plt.figure(figsize=(12, 6))
     melted_df = pd.melt(summary_df, id_vars="Model", var_name="Metric", value_name="Value")
     sns.barplot(data=melted_df, x="Metric", y="Value", hue="Model", palette="coolwarm")

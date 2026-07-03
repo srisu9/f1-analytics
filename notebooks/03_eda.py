@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 
-# Set aesthetic styling
+                       
 plt.style.use('dark_background')
 sns.set_theme(style="whitegrid", rc={
     "axes.facecolor": "#1a1a1a",
@@ -34,11 +34,11 @@ def generate_eda():
     
     print("Generating EDA Plots...")
     
-    # 1. Target Distribution
+                            
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
     counts = df["Top10"].value_counts()
     
-    # Bar plot
+              
     sns.barplot(x=counts.index, y=counts.values, ax=axes[0], palette=[CHARCOAL, F1_RED], hue=counts.index, legend=False)
     axes[0].set_title("Top 10 Finish Count (Target Variable)", fontsize=14, fontweight="bold", pad=15)
     axes[0].set_xlabel("Finished in Top 10", fontsize=12)
@@ -46,7 +46,7 @@ def generate_eda():
     axes[0].set_xticks([0, 1])
     axes[0].set_xticklabels(["No (Pos > 10)", "Yes (Pos <= 10)"])
     
-    # Pie plot
+              
     axes[1].pie(counts, labels=["No (Pos > 10)", "Yes (Pos <= 10)"], autopct='%1.1f%%', 
                 colors=[CHARCOAL, F1_RED], startangle=90, textprops={'fontsize': 12, 'color': 'white'},
                 wedgeprops={'edgecolor': '#121212', 'linewidth': 2})
@@ -55,7 +55,7 @@ def generate_eda():
     plt.savefig(f"{fig_dir}/01_target_distribution.png", dpi=150, facecolor='#121212')
     plt.close()
     
-    # 2. Grid Position vs Top10
+                               
     plt.figure(figsize=(10, 6))
     sns.boxplot(data=df, x="Top10", y="grid", palette=[CHARCOAL, F1_RED], hue="Top10", legend=False)
     plt.title("Grid Position vs. Top 10 Finish", fontsize=14, fontweight="bold", pad=15)
@@ -66,9 +66,9 @@ def generate_eda():
     plt.savefig(f"{fig_dir}/02_grid_vs_top10.png", dpi=150, facecolor='#121212')
     plt.close()
     
-    # 3. Qualifying Position vs Top10
+                                     
     plt.figure(figsize=(10, 6))
-    # Drop rows where qualifying position is NaN for visualization
+                                                                  
     quali_df = df.dropna(subset=["qualifying_position"])
     sns.violinplot(data=quali_df, x="Top10", y="qualifying_position", palette=[CHARCOAL, F1_RED], hue="Top10", legend=False, split=False)
     plt.title("Qualifying Position vs. Top 10 Finish", fontsize=14, fontweight="bold", pad=15)
@@ -79,9 +79,9 @@ def generate_eda():
     plt.savefig(f"{fig_dir}/03_qualifying_vs_top10.png", dpi=150, facecolor='#121212')
     plt.close()
     
-    # 4. Constructor Performance
+                                
     plt.figure(figsize=(12, 8))
-    # Filter to constructors with a reasonable number of races (e.g. > 100 entries)
+                                                                                   
     top_constructors = df["constructor_name"].value_counts()[df["constructor_name"].value_counts() > 100].index
     const_perf = df[df["constructor_name"].isin(top_constructors)].groupby("constructor_name")["Top10"].mean().sort_values(ascending=False).head(20)
     
@@ -93,7 +93,7 @@ def generate_eda():
     plt.savefig(f"{fig_dir}/04_constructor_performance.png", dpi=150, facecolor='#121212')
     plt.close()
     
-    # 5. Constructor Nationality
+                                
     plt.figure(figsize=(12, 6))
     top_nations = df["constructor_nationality"].value_counts().head(10).index
     sns.countplot(data=df[df["constructor_nationality"].isin(top_nations)], 
@@ -106,7 +106,7 @@ def generate_eda():
     plt.savefig(f"{fig_dir}/05_constructor_nationality.png", dpi=150, facecolor='#121212')
     plt.close()
     
-    # 6. Year-wise Trends
+                         
     plt.figure(figsize=(12, 6))
     yearly_grid_size = df.groupby("year")["grid"].max()
     yearly_top10_rate = df.groupby("year")["Top10"].mean() * 100
@@ -129,7 +129,7 @@ def generate_eda():
     plt.savefig(f"{fig_dir}/06_year_wise_trends.png", dpi=150, facecolor='#121212')
     plt.close()
     
-    # 7. Circuit Analysis
+                         
     plt.figure(figsize=(12, 8))
     top_circuits = df["circuit_name"].value_counts().head(20).index
     circuit_perf = df[df["circuit_name"].isin(top_circuits)].groupby("circuit_name")["Top10"].mean().sort_values(ascending=False)
@@ -142,7 +142,7 @@ def generate_eda():
     plt.savefig(f"{fig_dir}/07_circuit_performance.png", dpi=150, facecolor='#121212')
     plt.close()
     
-    # 8. Correlation Matrix
+                           
     plt.figure(figsize=(10, 8))
     numerical_cols = ["grid", "qualifying_position", "year", "round", "lat", "lng", "alt", "Top10"]
     corr = df[numerical_cols].corr()
@@ -155,7 +155,7 @@ def generate_eda():
     plt.savefig(f"{fig_dir}/08_correlation_matrix.png", dpi=150, facecolor='#121212')
     plt.close()
     
-    # 9. Missing Values Bar Chart
+                                 
     plt.figure(figsize=(12, 6))
     missing = df.isnull().sum()
     missing_pct = (missing / len(df)) * 100
@@ -174,7 +174,7 @@ def generate_eda():
     plt.savefig(f"{fig_dir}/09_missing_values.png", dpi=150, facecolor='#121212')
     plt.close()
     
-    # 10. Grid Position Distribution
+                                    
     plt.figure(figsize=(12, 6))
     sns.histplot(data=df, x="grid", kde=True, bins=df["grid"].nunique(), color=F1_RED, edgecolor="#121212", linewidth=1.5)
     plt.title("Distribution of Starting Grid Positions", fontsize=14, fontweight="bold", pad=15)

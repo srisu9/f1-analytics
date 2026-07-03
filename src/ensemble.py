@@ -1,17 +1,17 @@
-"""
-ensemble.py — Weighted Soft-Voting Blender
-==========================================
-Loads XGBoost, CatBoost, and LightGBM models from the models/ directory
-and blends their probability predictions:
-
-    P_ensemble = 0.4 * P_xgb  +  0.4 * P_cat  +  0.2 * P_lgb
-
-Usage:
-    from src.ensemble import EnsemblePredictor
-    predictor = EnsemblePredictor()
-    proba = predictor.predict_proba(X)   # shape (n_samples, 2)
-    preds = predictor.predict(X)         # binary labels
-"""
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+   
 
 import numpy as np
 import joblib
@@ -43,10 +43,7 @@ class EnsemblePredictor:
         self.weights = {}
         self._load_models()
 
-    # ------------------------------------------------------------------
-    # Private helpers
-    # ------------------------------------------------------------------
-
+                                                                        
     def _load_models(self):
         """Load whichever model files are present and normalise weights."""
         paths = {
@@ -70,7 +67,7 @@ class EnsemblePredictor:
                 "Run 08_walk_forward_eval.py first to train them.".format(self.models_dir)
             )
 
-        # Normalise weights to the models we actually loaded
+                                                            
         raw_w = {k: self._requested_weights.get(k, 0.0) for k in loaded}
         total = sum(raw_w.values())
         if total == 0:
@@ -81,10 +78,7 @@ class EnsemblePredictor:
         self.weights = {k: v / total for k, v in raw_w.items()}
         print(f"[EnsemblePredictor] Active weights: {self.weights}")
 
-    # ------------------------------------------------------------------
-    # Public API
-    # ------------------------------------------------------------------
-
+                                                                        
     def predict_proba(self, X):
         """
         Returns blended probability estimates, shape (n_samples, 2).
@@ -92,10 +86,10 @@ class EnsemblePredictor:
         """
         blend = np.zeros(len(X))
         for key, model in self.models.items():
-            proba  = model.predict_proba(X)[:, 1]   # P(Top10=1)
+            proba  = model.predict_proba(X)[:, 1]               
             blend += self.weights[key] * proba
 
-        # Convert back to (n, 2) format
+                                       
         return np.column_stack([1 - blend, blend])
 
     def predict(self, X, threshold=0.5):
