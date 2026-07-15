@@ -1,0 +1,21 @@
+{
+  "grid": 0.5751771926879883,
+  "driverRef_encoded": 0.5338245630264282,
+  "constructor_name_encoded": 0.24297963082790375,
+  "driver_win_rate": 0.12884604930877686,
+  "constructor_season_points": 0.12662062048912048,
+  "rolling_avg_finish_5": 0.11275512725114822,
+  "prev_race_finish": 0.058586329221725464,
+  "constructor_win_rate": 0.05755819380283356,
+  "circuit_grid_finish_corr": 0.052622586488723755,
+  "smoothed_circuit_avg_finish": 0.0451543927192688,
+  "driver_age": 0.0405925028026104,
+  "driver_experience": 0.0399017371237278,
+  "rolling_avg_finish_3": 0.03535546362400055,
+  "grid_qualifying_diff": 0.03262163698673248,
+  "alt": 0.02945200353860855,
+  "circuitRef_encoded": 0.02585752308368683,
+  "lat": 0.01710166595876217,
+  "lng": 0.011211934499442577,
+  "home_race": 0.00374376168474555
+}

@@ -1,40 +1,29 @@
-# Python virtual environment
-.venv/
-venv/
-env/
-
-# Python cache
+# Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-*.egg-info/
-dist/
-build/
+*.py[cod]
+*$py.class
+*.so
 
-# Streamlit logs
-streamlit_out.log
-streamlit_err.log
+# Environment
+.env
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
 
-# Jupyter checkpoints
-.ipynb_checkpoints/
-
-# IDE settings
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# CatBoost training logs
+# Project specifics
+data/raw/*.csv
+data/fastf1/
 catboost_info/
+*.log
 
-# Scratch files
-scratch/
-check_data.py
+# Jupyter Notebook
+.ipynb_checkpoints
 
-# Large raw data files (keep processed ones for the app)
-data/raw/lap_times.csv
+# IDEs
+.vscode/
+.idea/
+.spyderproject
+.ropeproject
