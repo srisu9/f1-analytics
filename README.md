@@ -33,7 +33,7 @@ The model uses only information that would be available before a race (no future
 2. **Driver Comparison** — Compare two drivers head-to-head at a selected circuit
 3. **Historical Replay** — Run the model on a past race and check how accurate it was
 4. **Season Projector** — Simulate an entire season and project the final standings
-5. **Model Evolution** — See how the model improved across development phases
+5. **Model Overview** — See the architecture, metrics, and SHAP feature importance of the deployed model
 
 ---
 
