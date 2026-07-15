@@ -429,10 +429,10 @@ def main():
                 plot_shap_waterfall(explainer, row_array, feature_names, sel_driver_detail)
 
     # ══════════════════════════════════════════════════════
-    # TAB 2 — Head-to-Head
+    # TAB 2 — Driver Comparison
     # ══════════════════════════════════════════════════════
     with tab2:
-        st.subheader("⚔️ Driver Head-to-Head")
+        st.subheader("⚔️ Driver Comparison")
         st.caption(
             "Stats reflect each driver's cumulative career record up to their last race in the dataset. "
             "Rolling form (3R avg) reflects their last 3 races. "
@@ -579,24 +579,28 @@ def main():
 
             p_a = float(model.predict_proba(Xa)[0][1])
             p_b = float(model.predict_proba(Xb)[0][1])
-            p_a_wins = p_a / (p_a + p_b + 1e-9)
-            p_b_wins = 1.0 - p_a_wins
 
             st.markdown("---")
             col_r1, col_r2, col_r3 = st.columns([2, 1, 2])
             with col_r1:
                 st.metric(label=f"{name_a.upper()} — Top-10 probability",
-                          value=f"{p_a_wins:.1%}")
+                          value=f"{p_a:.1%}")
             with col_r2:
                 st.markdown("<br><br>", unsafe_allow_html=True)
                 st.markdown("### VS")
             with col_r3:
                 st.metric(label=f"{name_b.upper()} — Top-10 probability",
-                          value=f"{p_b_wins:.1%}")
+                          value=f"{p_b:.1%}")
 
             st.info(
                 f"**{h2h_circuit}** — Circuit Overtaking Index: {c_oi:.2f} "
                 f"({'grid position dominates' if c_oi > 0.75 else 'normal overtaking' if c_oi > 0.55 else 'high overtaking circuit'})"
+            )
+
+            st.caption(
+                "**Note on Probabilities:** The production model is an XGBoost binary classifier trained to predict "
+                "each driver's independent probability of finishing in the points (Top 10). It is *not* a pairwise ranking model. "
+                "Pairwise finishing order prediction (e.g., XGBoost Ranker) is a planned future enhancement."
             )
 
             # ── Performance Comparison table ──────────────────────
